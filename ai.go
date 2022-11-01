@@ -16,7 +16,7 @@ import (
 
 func Handle(err error) {
 	if err != nil {
-		log.Panic(err)
+		log.Fatalln(err)
 	}
 }
 
@@ -85,16 +85,18 @@ func main() {
 	Handle(err)
 	//The main audio loop used to collect
 	onRecvFrames := func(pSample2, pSample []byte, framecount uint32) {
+		
 		sampleCount := framecount * deviceConfig.Capture.Channels * sizeInBytes
 		pCapturedSamples = append(pCapturedSamples, pSample...)
 		newCapturedSampleCount := capturedSampleCount + sampleCount
 		capturedSampleCount = newCapturedSampleCount
 		streamthing := bytes.NewReader(pSample)
 		stream.FeedAudioContent(toint16(streamthing))
+
 		if capturedSampleCount > deviceConfig.SampleRate*lisentime {
 			current, err = stream.IntermediateDecode()
 			Handle(err)
-			fmt.Println(current)
+			//fmt.Println(current)
 			parsed = strings.Split(current," ")
 			//fmt.Println(parsed)
 			if len(parsed) > 0 {
@@ -122,6 +124,7 @@ func main() {
 						//fmt.Println("running " + strings.Join(command," "))
 						Interpret(currenttext,oldsize)
 						*hold = false
+
 					}(oldsize, &parsed,&hold)
 				}
 			}
@@ -136,13 +139,7 @@ func main() {
 		}
 
 	}
-
-
-
-
-
-
-
+	
 	fmt.Println("Recording...")
 	captureCallbacks := malgo.DeviceCallbacks{
 		Data: onRecvFrames,
@@ -151,7 +148,8 @@ func main() {
 	err = device.Start()
 	Handle(err)
 
-	fmt.Scanln()
+	_, err = fmt.Scanln()
+	Handle(err)
 
 	device.Uninit()
 

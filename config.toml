@@ -1,9 +1,0 @@
-[[command]]
-ID = "open"
-act = "open (?P<program>.+)"
-command = "$program"
-
-[[command]]
-ID = "ask"
-act = "ask (?P<text>.+)"
-command = "./gpt -prompt $text | mimic"
